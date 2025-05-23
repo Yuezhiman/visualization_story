@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>人物事件时间线</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="events.js" defer></script>
+  <style>
+    body {
+      margin: 0;
+      font-family: sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+
+    #event-display {
+      flex: 1;
+      padding: 20px;
+      overflow: auto;
+      background: #f5f5f5;
+    }
+
+    #timeline {
+      height: 160px;
+      border-top: 1px solid #ccc;
+      background: #fff;
+      overflow-x: auto;
+    }
+
+    .event-box {
+      background: #fff;
+      padding: 10px;
+      border: 1px solid #ccc;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    video, img {
+      max-width: 100%;
+      margin-top: 10px;
+    }
+
+    .event-marker {
+      cursor: pointer;
+      stroke: #333;
+    }
+
+    .active {
+      stroke: red;
+      stroke-width: 3;
+    }
+
+    .marker-label {
+      font-size: 10px;
+      text-anchor: middle;
+      pointer-events: none;
+    }
+
+    #controls {
+      text-align: center;
+      padding: 5px;
+    }
+
+    button {
+      padding: 5px 10px;
+      font-size: 14px;
+      margin: 0 5px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="event-display"></div>
+<div id="controls">
+  <button onclick="startAutoPlay()">▶️ 播放</button>
+  <button onclick="stopAutoPlay()">⏸ 暂停</button>
+</div>
+<div id="timeline"></div>
+
+<script>
+let currentIndex = 0;
+let autoplayTimer = null;
+let timelineSvg, x, zoomGroup;
+
+function showEvent(d) {
+  stopAutoPlay();
+  d3.selectAll(".event-marker").classed("active", e => e === d);
+  const display = d3.select("#event-display");
+  display.html("");
+  const box = display.append("div").attr("class", "event-box");
+  box.append("h2").text(d.title);
+  box.append("p").text(d.description);
+  if (d.image) {
+    box.append("img").attr("src", "images/" + d.image);
+  }
+  if (d.video) {
+    box.append("video")
+        .attr("src", "videos/" + d.video)
+        .attr("controls", true)
+        .attr("autoplay", true);
+  }
+}
+
+function startAutoPlay() {
+  stopAutoPlay();
+  autoplayTimer = setInterval(() => {
+    showEvent(events[currentIndex]);
+    currentIndex = (currentIndex + 1) % events.length;
+  }, 5000);
+}
+
+function stopAutoPlay() {
+  if (autoplayTimer) {
+    clearInterval(autoplayTimer);
+    autoplayTimer = null;
+  }
+}
+
+function renderTimeline() {
+  const width = document.getElementById("timeline").clientWidth;
+  const height = 160;
+  timelineSvg = d3.select("#timeline").append("svg")
+      .attr("width", width * 3)
+      .attr("height", height);
+
+  const margin = { left: 50, right: 50 };
+  x = d3.scaleTime()
+      .domain(d3.extent(events, d => d.time))
+      .range([margin.left, width * 3 - margin.right]);
+
+  const xAxis = d3.axisBottom(x).ticks(d3.timeYear.every(1));
+
+  zoomGroup = timelineSvg.append("g")
+      .attr("class", "zoom-group");
+
+  const axisGroup = zoomGroup.append("g")
+      .attr("transform", `translate(0, ${height - 30})`)
+      .call(xAxis);
+
+  const markers = zoomGroup.selectAll(".event-marker")
+      .data(events)
+      .enter()
+      .append("g")
+      .attr("transform", d => `translate(${x(d.time)}, ${height - 60})`)
+      .on("click", (e, d) => showEvent(d));
+
+  markers.append("rect")
+      .attr("class", "event-marker")
+      .attr("width", 40)
+      .attr("height", 40)
+      .attr("x", -20)
+      .attr("y", -20)
+      .attr("fill", "#6baed6");
+
+  markers.append("text")
+      .attr("class", "marker-label")
+      .attr("dy", 5)
+      .text(d => d.title);
+
+  // 支持缩放 & 拖动
+  timelineSvg.call(d3.zoom()
+    .scaleExtent([0.5, 5])
+    .on("zoom", (e) => {
+      zoomGroup.attr("transform", e.transform);
+    }));
+}
+
+// 页面初始化
+document.addEventListener("DOMContentLoaded", () => {
+  renderTimeline();
+  showEvent(events[0]);
+  startAutoPlay();
+});
+</script>
+
+</body>
+</html>
