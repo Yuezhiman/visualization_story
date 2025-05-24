@@ -95,120 +95,120 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-<!-- // function renderTimeline() {
-//   const timeline = d3.select("#timeline").append("svg")
-//     .attr("width", 2000)
-//     .attr("height", 200);
+<!--  function renderTimeline() {
+  const timeline = d3.select("#timeline").append("svg")
+    .attr("width", 2000)
+    .attr("height", 200);
 
-//   const x = d3.scaleTime()
-//     .domain(d3.extent(events, d => d.time))
-//     .range([60, 1940]);
+  const x = d3.scaleTime()
+    .domain(d3.extent(events, d => d.time))
+    .range([60, 1940]);
 
-//   const area = d3.area()
-//     .x(d => x(d.time))
-//     .y0(200)
-//     .y1(d => 200 - (d.peak || 0) * 100);
+  const area = d3.area()
+    .x(d => x(d.time))
+    .y0(200)
+    .y1(d => 200 - (d.peak || 0) * 100);
 
-//   timeline.append("path")
-//     .datum(events)
-//     .attr("class", "mountain")
-//     .attr("d", area);
+  timeline.append("path")
+    .datum(events)
+    .attr("class", "mountain")
+    .attr("d", area);
 
-//   timeline.append("g")
-//     .attr("transform", "translate(0,180)")
-//     .call(d3.axisBottom(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat("%Y")));
+  timeline.append("g")
+    .attr("transform", "translate(0,180)")
+    .call(d3.axisBottom(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat("%Y")));
 
-//   const markers = timeline.selectAll(".event-marker")
-//     .data(events)
-//     .enter()
-//     .append("g")
-//     .attr("transform", d => `translate(${x(d.time)},140)`)
-//     .on("click", (e, d) => showEvent(d));
+  const markers = timeline.selectAll(".event-marker")
+    .data(events)
+    .enter()
+    .append("g")
+    .attr("transform", d => `translate(${x(d.time)},140)`)
+    .on("click", (e, d) => showEvent(d));
 
-//   markers.append("rect")
-//     .attr("class", "event-marker")
-//     .attr("x", -25)
-//     .attr("y", -25)
-//     .attr("width", 50)
-//     .attr("height", 50)
-//     .attr("rx", 6)
-//     .attr("ry", 6);
+  markers.append("rect")
+    .attr("class", "event-marker")
+    .attr("x", -25)
+    .attr("y", -25)
+    .attr("width", 50)
+    .attr("height", 50)
+    .attr("rx", 6)
+    .attr("ry", 6);
 
-//   markers.append("text")
-//     .attr("class", "marker-label")
-//     .attr("y", 5)
-//     .text(d => d.title);
+  markers.append("text")
+    .attr("class", "marker-label")
+    .attr("y", 5)
+    .text(d => d.title);
 
-//   let isDragging = false;
-//   let startX = 0;
-//   let scrollLeft = 0;
+  let isDragging = false;
+  let startX = 0;
+  let scrollLeft = 0;
 
-//   const timelineDiv = document.getElementById("timeline");
-//   timelineDiv.style.overflowX = "auto";
+  const timelineDiv = document.getElementById("timeline");
+  timelineDiv.style.overflowX = "auto";
 
-//   timelineDiv.addEventListener("mousedown", e => {
-//     isDragging = true;
-//     startX = e.pageX - timelineDiv.offsetLeft;
-//     scrollLeft = timelineDiv.scrollLeft;
-//   });
+  timelineDiv.addEventListener("mousedown", e => {
+    isDragging = true;
+    startX = e.pageX - timelineDiv.offsetLeft;
+    scrollLeft = timelineDiv.scrollLeft;
+  });
 
-//   timelineDiv.addEventListener("mouseleave", () => isDragging = false);
-//   timelineDiv.addEventListener("mouseup", () => isDragging = false);
-//   timelineDiv.addEventListener("mousemove", e => {
-//     if (!isDragging) return;
-//     const x = e.pageX - timelineDiv.offsetLeft;
-//     const walk = (x - startX) * 1.5;
-//     timelineDiv.scrollLeft = scrollLeft - walk;
-//   });
-// }
-// 渲染花朵图
-// function renderFlowerPlot() {
-//   const width = 400;
-//   const height = 400;
-//   const center = { x: width / 2, y: height / 2 };
-//   const radius = 100;
+  timelineDiv.addEventListener("mouseleave", () => isDragging = false);
+  timelineDiv.addEventListener("mouseup", () => isDragging = false);
+  timelineDiv.addEventListener("mousemove", e => {
+    if (!isDragging) return;
+    const x = e.pageX - timelineDiv.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    timelineDiv.scrollLeft = scrollLeft - walk;
+  });
+}
+渲染花朵图
+function renderFlowerPlot() {
+  const width = 400;
+  const height = 400;
+  const center = { x: width / 2, y: height / 2 };
+  const radius = 100;
 
-//   const svg = d3.select("#flower-plot")
-//     .append("svg")
-//     .attr("width", width)
-//     .attr("height", height);
+  const svg = d3.select("#flower-plot")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
 
-//   svg.append("circle")
-//     .attr("cx", center.x)
-//     .attr("cy", center.y)
-//     .attr("r", radius)
-//     .attr("fill", "none")
-//     .attr("stroke", "#aaa")
-//     .attr("stroke-width", 2);
+  svg.append("circle")
+    .attr("cx", center.x)
+    .attr("cy", center.y)
+    .attr("r", radius)
+    .attr("fill", "none")
+    .attr("stroke", "#aaa")
+    .attr("stroke-width", 2);
 
-//   const inside = events.filter(d => d.peak >= peakThreshold);
-//   const outside = events.filter(d => d.peak < peakThreshold);
+  const inside = events.filter(d => d.peak >= peakThreshold);
+  const outside = events.filter(d => d.peak < peakThreshold);
 
-//   inside.forEach((d, i) => {
-//     const angle = 2 * Math.PI * i / inside.length;
-//     d.x = center.x + radius * 0.5 * Math.cos(angle);
-//     d.y = center.y + radius * 0.5 * Math.sin(angle);
-//   });
+  inside.forEach((d, i) => {
+    const angle = 2 * Math.PI * i / inside.length;
+    d.x = center.x + radius * 0.5 * Math.cos(angle);
+    d.y = center.y + radius * 0.5 * Math.sin(angle);
+  });
 
-//   outside.forEach((d, i) => {
-//     const angle = 2 * Math.PI * i / outside.length;
-//     d.x = center.x + radius * 1.4 * Math.cos(angle);
-//     d.y = center.y + radius * 1.4 * Math.sin(angle);
-//   });
+  outside.forEach((d, i) => {
+    const angle = 2 * Math.PI * i / outside.length;
+    d.x = center.x + radius * 1.4 * Math.cos(angle);
+    d.y = center.y + radius * 1.4 * Math.sin(angle);
+  });
 
-//   const all = [...inside, ...outside];
+  const all = [...inside, ...outside];
 
-//   svg.selectAll(".flower-node")
-//     .data(all)
-//     .enter()
-//     .append("circle")
-//     .attr("class", "flower-node")
-//     .attr("cx", d => d.x)
-//     .attr("cy", d => d.y)
-//     .attr("r", 10)
-//     .attr("fill", d => categoryColor[d.category] || categoryColor["其他"])
-//     .on("click", (e, d) => {
-//       showEvent(d);
-//     });
-// } -->
+  svg.selectAll(".flower-node")
+    .data(all)
+    .enter()
+    .append("circle")
+    .attr("class", "flower-node")
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("r", 10)
+    .attr("fill", d => categoryColor[d.category] || categoryColor["其他"])
+    .on("click", (e, d) => {
+      showEvent(d);
+    });
+ } -->
 
