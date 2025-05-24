@@ -42,11 +42,9 @@ function renderTimeline() {
     .attr("y", 5)
     .text(d => d.title);
 
-  let isDragging = false;
-  let startX = 0;
-  let scrollLeft = 0;
-
   const timelineDiv = document.getElementById("timeline");
+  let isDragging = false, startX = 0, scrollLeft = 0;
+
   timelineDiv.style.overflowX = "auto";
 
   timelineDiv.addEventListener("mousedown", e => {
