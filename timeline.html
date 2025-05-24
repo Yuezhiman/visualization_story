@@ -1,18 +1,31 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>人物事件时间线</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>人物时间线</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script src="events.js" defer></script>
   <style>
-    body {
+    html, body {
       margin: 0;
       font-family: sans-serif;
+      height: 100%;
       display: flex;
       flex-direction: column;
-      height: 100vh;
+    }
+
+    #main {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    #flower-plot {
+      width: 400px;
+      padding: 10px;
+      border-right: 1px solid #ccc;
+      background: #fafafa;
     }
 
     #event-display {
@@ -23,28 +36,41 @@
     }
 
     #timeline {
-      height: 160px;
+      height: 200px;
       border-top: 1px solid #ccc;
       background: #fff;
-      overflow-x: auto;
     }
 
     .event-box {
       background: #fff;
-      padding: 10px;
+      padding: 15px;
       border: 1px solid #ccc;
       max-width: 700px;
       margin: auto;
     }
 
-    video, img {
+    img, video {
       max-width: 100%;
       margin-top: 10px;
     }
 
-    .event-marker {
+    #controls {
+      text-align: center;
+      padding: 10px;
+      background: #eee;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 0 5px;
+      font-size: 14px;
+    }
+
+    .event-marker, .flower-node {
+      fill: gray;
       cursor: pointer;
-      stroke: #333;
+      stroke: #000;
+      stroke-width: 1;
     }
 
     .active {
@@ -53,63 +79,86 @@
     }
 
     .marker-label {
-      font-size: 10px;
+      font-size: 12px;
       text-anchor: middle;
+      fill: #fff;
       pointer-events: none;
     }
 
-    #controls {
-      text-align: center;
-      padding: 5px;
-    }
-
-    button {
-      padding: 5px 10px;
-      font-size: 14px;
-      margin: 0 5px;
+    .mountain {
+      fill: lightgray;
+      opacity: 0.4;
     }
   </style>
 </head>
 <body>
 
-<div id="event-display"></div>
 <div id="controls">
   <button onclick="startAutoPlay()">▶️ 播放</button>
   <button onclick="stopAutoPlay()">⏸ 暂停</button>
 </div>
+
+<div id="main">
+  <div id="flower-plot"></div>
+  <div id="event-display"></div>
+</div>
+
 <div id="timeline"></div>
 
 <script>
+
 let currentIndex = 0;
 let autoplayTimer = null;
-let timelineSvg, x, zoomGroup;
+let isManualInterruption = false;  
 
-function showEvent(d) {
-  stopAutoPlay();
+const peakThreshold = 0.6;
+const categoryColor = {
+  "职业": "#4CAF50",
+  "家庭": "#2196F3",
+  "社会责任": "#FFC107",
+  "其他": "#9E9E9E"
+};
+
+function showEvent(d, fromAutoplay = false) {
+  if (!fromAutoplay) {
+    // 用户点击时中断自动播放
+    stopAutoPlay();
+    isManualInterruption = true;
+  }
+
   d3.selectAll(".event-marker").classed("active", e => e === d);
-  const display = d3.select("#event-display");
-  display.html("");
+  d3.selectAll(".flower-node").classed("active", e => e === d);
+
+  const display = d3.select("#event-display").html("");
   const box = display.append("div").attr("class", "event-box");
   box.append("h2").text(d.title);
   box.append("p").text(d.description);
-  if (d.image) {
-    box.append("img").attr("src", "images/" + d.image);
+
+  if (d.images) {
+    d.images.forEach(img => box.append("img").attr("src", "images/" + img));
   }
+
   if (d.video) {
     box.append("video")
-        .attr("src", "videos/" + d.video)
-        .attr("controls", true)
-        .attr("autoplay", true);
+      .attr("src", "videos/" + d.video)
+      .attr("controls", true)
+      .attr("autoplay", true);
   }
 }
 
+
 function startAutoPlay() {
   stopAutoPlay();
+  isManualInterruption = false; // 重置标志
+
   autoplayTimer = setInterval(() => {
-    showEvent(events[currentIndex]);
-    currentIndex = (currentIndex + 1) % events.length;
+    if (!isManualInterruption) {
+      showEvent(events[currentIndex], true); // 自动播放用 true
+      currentIndex = (currentIndex + 1) % events.length;
+    }
   }, 5000);
 }
+
 
 function stopAutoPlay() {
   if (autoplayTimer) {
@@ -119,56 +168,124 @@ function stopAutoPlay() {
 }
 
 function renderTimeline() {
-  const width = document.getElementById("timeline").clientWidth;
-  const height = 160;
-  timelineSvg = d3.select("#timeline").append("svg")
-      .attr("width", width * 3)
-      .attr("height", height);
+  const timeline = d3.select("#timeline").append("svg")
+    .attr("width", 2000)
+    .attr("height", 200);
 
-  const margin = { left: 50, right: 50 };
-  x = d3.scaleTime()
-      .domain(d3.extent(events, d => d.time))
-      .range([margin.left, width * 3 - margin.right]);
+  const x = d3.scaleTime()
+    .domain(d3.extent(events, d => d.time))
+    .range([60, 1940]);
 
-  const xAxis = d3.axisBottom(x).ticks(d3.timeYear.every(1));
+  const area = d3.area()
+    .x(d => x(d.time))
+    .y0(200)
+    .y1(d => 200 - (d.peak || 0) * 100);
 
-  zoomGroup = timelineSvg.append("g")
-      .attr("class", "zoom-group");
+  timeline.append("path")
+    .datum(events)
+    .attr("class", "mountain")
+    .attr("d", area);
 
-  const axisGroup = zoomGroup.append("g")
-      .attr("transform", `translate(0, ${height - 30})`)
-      .call(xAxis);
+  timeline.append("g")
+    .attr("transform", "translate(0,180)")
+    .call(d3.axisBottom(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat("%Y")));
 
-  const markers = zoomGroup.selectAll(".event-marker")
-      .data(events)
-      .enter()
-      .append("g")
-      .attr("transform", d => `translate(${x(d.time)}, ${height - 60})`)
-      .on("click", (e, d) => showEvent(d));
+  const markers = timeline.selectAll(".event-marker")
+    .data(events)
+    .enter()
+    .append("g")
+    .attr("transform", d => `translate(${x(d.time)},140)`)
+    .on("click", (e, d) => showEvent(d));
 
   markers.append("rect")
-      .attr("class", "event-marker")
-      .attr("width", 40)
-      .attr("height", 40)
-      .attr("x", -20)
-      .attr("y", -20)
-      .attr("fill", "#6baed6");
+    .attr("class", "event-marker")
+    .attr("x", -25)
+    .attr("y", -25)
+    .attr("width", 50)
+    .attr("height", 50)
+    .attr("rx", 6)
+    .attr("ry", 6);
 
   markers.append("text")
-      .attr("class", "marker-label")
-      .attr("dy", 5)
-      .text(d => d.title);
+    .attr("class", "marker-label")
+    .attr("y", 5)
+    .text(d => d.title);
 
-  // 支持缩放 & 拖动
-  timelineSvg.call(d3.zoom()
-    .scaleExtent([0.5, 5])
-    .on("zoom", (e) => {
-      zoomGroup.attr("transform", e.transform);
-    }));
+  let isDragging = false;
+  let startX = 0;
+  let scrollLeft = 0;
+
+  const timelineDiv = document.getElementById("timeline");
+  timelineDiv.style.overflowX = "auto";
+
+  timelineDiv.addEventListener("mousedown", e => {
+    isDragging = true;
+    startX = e.pageX - timelineDiv.offsetLeft;
+    scrollLeft = timelineDiv.scrollLeft;
+  });
+
+  timelineDiv.addEventListener("mouseleave", () => isDragging = false);
+  timelineDiv.addEventListener("mouseup", () => isDragging = false);
+  timelineDiv.addEventListener("mousemove", e => {
+    if (!isDragging) return;
+    const x = e.pageX - timelineDiv.offsetLeft;
+    const walk = (x - startX) * 1.5;
+    timelineDiv.scrollLeft = scrollLeft - walk;
+  });
 }
 
-// 页面初始化
+function renderFlowerPlot() {
+  const width = 400;
+  const height = 400;
+  const center = { x: width / 2, y: height / 2 };
+  const radius = 100;
+
+  const svg = d3.select("#flower-plot")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+  svg.append("circle")
+    .attr("cx", center.x)
+    .attr("cy", center.y)
+    .attr("r", radius)
+    .attr("fill", "none")
+    .attr("stroke", "#aaa")
+    .attr("stroke-width", 2);
+
+  const inside = events.filter(d => d.peak >= peakThreshold);
+  const outside = events.filter(d => d.peak < peakThreshold);
+
+  inside.forEach((d, i) => {
+    const angle = 2 * Math.PI * i / inside.length;
+    d.x = center.x + radius * 0.5 * Math.cos(angle);
+    d.y = center.y + radius * 0.5 * Math.sin(angle);
+  });
+
+  outside.forEach((d, i) => {
+    const angle = 2 * Math.PI * i / outside.length;
+    d.x = center.x + radius * 1.4 * Math.cos(angle);
+    d.y = center.y + radius * 1.4 * Math.sin(angle);
+  });
+
+  const all = [...inside, ...outside];
+
+  svg.selectAll(".flower-node")
+    .data(all)
+    .enter()
+    .append("circle")
+    .attr("class", "flower-node")
+    .attr("cx", d => d.x)
+    .attr("cy", d => d.y)
+    .attr("r", 10)
+    .attr("fill", d => categoryColor[d.category] || categoryColor["其他"])
+    .on("click", (e, d) => {
+      showEvent(d);
+    });
+}
+
 document.addEventListener("DOMContentLoaded", () => {
+  renderFlowerPlot();
   renderTimeline();
   showEvent(events[0]);
   startAutoPlay();
