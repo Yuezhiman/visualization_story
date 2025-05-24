@@ -1,5 +1,5 @@
 html, body {
-      margin: 0;
+      margin: 10;
       font-family: sans-serif;
       height: 100%;
       display: flex;
@@ -10,15 +10,32 @@ html, body {
     display: flex;
     flex: 1;
     overflow: hidden;
+    justify-content: space-around;
 }
 
-#flower-plot {
+/* #flower-plot {
     width: 400px;
     padding: 10px;
     border-right: 1px solid #ccc;
     background: #fafafa;
-}
-
+} */
+#flower-plot {
+      margin-top: 30px;
+    }
+    .flower-node {
+      cursor: pointer;
+      stroke: #eb1111;
+      stroke-width: 1;
+      opacity: 0.8;
+    }
+    .flower-label {
+      font-size: 10px;
+      fill: #e4d912;
+    }
+    .legend text {
+      font-size: 12px;
+      fill: #1790e7;
+    }
 #event-display {
     flex: 1;
     padding: 20px;
