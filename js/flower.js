@@ -7,7 +7,9 @@ function renderFlowerPlot() {
   const svg = d3.select("#flower-plot")
     .append("svg")
     .attr("width", width)
-    .attr("height", height);
+    .attr("height", height)
+    .attr("viewBox", `0 0 ${width} ${height}`)
+    .attr("preserveAspectRatio", "xMidYMid meet");
 
   // 渐变和阴影
   const defs = svg.append("defs");
@@ -73,6 +75,8 @@ function renderFlowerPlot() {
     .attr("filter", "url(#drop-shadow)")
     .transition()
     .duration(1000)
+    .ease(d3.easeBackOut)
+    // 使用 d3.easeBackOut 使动画更自然
     .attr("cx", d => d.x)
     .attr("cy", d => d.y)
     .attr("r", d => 6 + d.peak * 6) // 根据 peak 动态设置大小
