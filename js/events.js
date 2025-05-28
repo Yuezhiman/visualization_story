@@ -2,20 +2,20 @@
 // 最好将事件按时间顺序排列，不然山峰会出bug
 const events = [
   {
-    title: "成为部门主管",
-    description: "晋升为部门主管，承担更多管理职责。",
-    time: new Date("2015-06-01"),
+    title: "选秀起点：高中生的逆袭",
+    description: "以高中生身份第 13 顺位被黄蜂选中，交易至湖人开启传奇生涯。",
+    time: new Date("1996-06-26"),
     peak: 0.85,  // 高于临界值，属于核心事件
     category: "职业",
-    image: "career1.jpg",
-    video: "career1.mp4"
+    image: ["1-1.png","1-2.jpg"],
+    video: "1-3.mp4"
   },
   {
-    title: "孩子出生",
-    description: "迎来了人生中的第一个孩子。",
-    time: new Date("2018-03-10"),
+    title: "扣篮大赛：初露锋芒",
+    description: "全明星周末斩获扣篮大赛冠军（19 岁，NBA 历史最年轻扣篮王），新秀赛 31 分创纪录。",
+    time: new Date("1997-02-08"),
     peak: 0.9,
-    category: "家庭",
+    category: "职业",
     image: "family1.jpg"
   },
   {

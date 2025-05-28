@@ -17,12 +17,14 @@
   <button onclick="stopAutoPlay()">⏸ 暂停</button>
 </div>
 
+
 <div id="main">
   <div id="flower-plot"></div>
   <div id="event-display"></div>
 </div>
 
 <div id="timeline"></div>
+<div id="media-display"></div>
 
 <script>
 
@@ -38,33 +40,64 @@ const categoryColor = {
   "其他": "#9E9E9E"
 };
 
-function showEvent(d, fromAutoplay = false) {
+function showEvent(event, fromAutoplay = false) {
+  let imageIndex = 0;
   if (!fromAutoplay) {
     // 用户点击时中断自动播放
     stopAutoPlay();
     isManualInterruption = true;
   }
 
-  d3.selectAll(".event-marker").classed("active", e => e === d);
-  d3.selectAll(".flower-node").classed("active", e => e === d);
+  d3.selectAll(".event-marker").classed("active", e => e === event);
+  d3.selectAll(".flower-node").classed("active", e => e === event);
 
   const display = d3.select("#event-display").html("");
   const box = display.append("div").attr("class", "event-box");
-  box.append("h2").text(d.title);
-  box.append("p").text(d.description);
+  box.append("h2").text(event.title);
+  box.append("p").text(event.description);
+  // 多张图片，模态
+  if (event.video) {
+  box.append("video")
+    .attr("src", event.video)
+    .attr("controls", true)
+    .attr("autoplay", true)
+    .style("max-width", "100%");
+} else if (event.image) {
+  if (Array.isArray(event.image)) {
+    let img = box.append("img")
+      .attr("src", event.image[0])
+      .style("max-width", "100%");
+    
+    if (event.image.length > 1) {
+      let imageIndex = 0;
+      const interval = setInterval(() => {
+        if (events[currentIndex] !== event) {
+          clearInterval(interval);
+          return;
+        }
+        imageIndex = (imageIndex + 1) % event.image.length;
+        img.attr("src", event.image[imageIndex]);
+      }, 2000);
+    }
 
-  if (d.images) {
-    d.images.forEach(img => box.append("img").attr("src", "images/" + img));
-  }
-
-  if (d.video) {
-    box.append("video")
-      .attr("src", "videos/" + d.video)
-      .attr("controls", true)
-      .attr("autoplay", true);
+  } else {
+    box.append("img")
+      .attr("src", event.image)
+      .style("max-width", "100%");
   }
 }
+  // if (event.images) {
+  //   event.images.forEach(img => box.append("img").attr("src", "images/" + img));
+  // }
 
+  // if (event.video) {
+  //   box.append("video")
+  //     .attr("src", "videos/" + event.video)
+  //     .attr("controls", true)
+  //     .attr("autoplay", true);
+  // }
+
+}
 
 function startAutoPlay() {
   stopAutoPlay();
