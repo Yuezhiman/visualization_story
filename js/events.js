@@ -14,14 +14,16 @@ const events = [
     title: "扣篮大赛：初露锋芒",
     description: "全明星周末斩获扣篮大赛冠军（19 岁，NBA 历史最年轻扣篮王），新秀赛 31 分创纪录。",
     time: new Date("1997-02-08"),
+    
     peak: 0.9,
     category: "职业",
     image: "family1.jpg"
   },
   {
-  title: "二胎",
-  description: "相应国家政策",
-  time: new Date("2020-01-01"),
+  title: "三连冠：从副手到核心",
+  description: "从替补到首发，总决赛 G4 带伤扭转战局，率队完成 “湖人三连冠”，成长为球队核心",
+  time: new Date("2000"),
+  // 如何生成时间段
   peak: 0.8,
   category: "家庭",
   images: ["pic1.jpg", "pic2.jpg"],

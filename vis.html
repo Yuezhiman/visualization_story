@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>人物时间线</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="css/story.css" />
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="js/flower.js" defer></script>
+  <script src="js/events.js" defer></script>
+</head>
+<body>
+
+<div id="global-controls">
+  <button id="global-play">▶️ 播放</button>
+  <button id="global-pause">⏸ 暂停</button>
+  <button id="global-prev">⏮️ 上一条</button>
+  <button id="global-next">⏭️ 下一条</button>
+</div>
+
+<div id="main">
+  <div id="flower-plot"></div>
+
+  <div id="event-display">
+    <h2 id="event-title"></h2>
+    <p id="event-time"></p>
+    <p id="event-description"></p>
+    <div id="media-display"></div>
+  </div>
+
+  <div id="timeline"></div>
+</div>
+
+<script>
+let currentIndex = 0;
+let autoplayTimer = null;
+const autoplayInterval = 5000;
+const peakThreshold = 0.6;
+const categoryColor = {
+  "职业": "#4CAF50",
+  "家庭": "#2196F3",
+  "社会责任": "#FFC107",
+  "其他": "#9E9E9E"
+};
+
+function renderEvent(index) {
+  const event = events[index];
+  if (!event) return;
+
+  document.getElementById("event-title").textContent = event.title;
+  document.getElementById("event-time").textContent = event.time.toLocaleDateString();
+  document.getElementById("event-description").textContent = event.description;
+
+  const display = document.getElementById("media-display");
+  display.innerHTML = "";
+
+  if (event.video) {
+    const video = document.createElement("video");
+    video.src = event.video;
+    video.controls = true;
+    video.autoplay = true;
+    display.appendChild(video);
+  } else if (event.image) {
+    const img = document.createElement("img");
+    img.src = Array.isArray(event.image) ? event.image[0] : event.image;
+    img.style.maxWidth = "100%";
+    display.appendChild(img);
+  }
+
+  d3.selectAll(".event-marker").classed("active", e => e === event);
+  d3.selectAll(".flower-node").classed("active", e => e === event);
+}
+
+function startAutoPlay() {
+  stopAutoPlay();
+  autoplayTimer = setInterval(() => {
+    currentIndex = (currentIndex + 1) % events.length;
+    renderEvent(currentIndex);
+  }, autoplayInterval);
+}
+
+function stopAutoPlay() {
+  if (autoplayTimer) {
+    clearInterval(autoplayTimer);
+    autoplayTimer = null;
+  }
+}
+
+document.getElementById("global-next").onclick = () => {
+  stopAutoPlay();
+  currentIndex = (currentIndex + 1) % events.length;
+  renderEvent(currentIndex);
+};
+
+document.getElementById("global-prev").onclick = () => {
+  stopAutoPlay();
+  currentIndex = (currentIndex - 1 + events.length) % events.length;
+  renderEvent(currentIndex);
+};
+
+document.getElementById("global-play").onclick = () => startAutoPlay();
+document.getElementById("global-pause").onclick = () => stopAutoPlay();
+
+document.addEventListener("DOMContentLoaded", () => {
+  renderFlowerPlot();
+  renderTimeline();
+  renderEvent(currentIndex);
+  startAutoPlay();
+});
+</script>
+</body>
+</html>

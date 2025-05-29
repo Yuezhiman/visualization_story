@@ -15,22 +15,32 @@
 <div id="controls">
   <button onclick="startAutoPlay()">▶️ 播放</button>
   <button onclick="stopAutoPlay()">⏸ 暂停</button>
+  <button id="prev">⏮️ 上一条</button>
 </div>
+
 
 
 <div id="main">
   <div id="flower-plot"></div>
-  <div id="event-display"></div>
+  <div id="event-display">
+    <h2 id="event-title"></h2>
+    <p id="event-time"></p>
+  <p id="event-description"></p>
+  <div id="media-display"></div>
+  </div>
+  
+
 </div>
 
 <div id="timeline"></div>
-<div id="media-display"></div>
 
 <script>
 
 let currentIndex = 0;
 let autoplayTimer = null;
 let isManualInterruption = false;  
+
+
 
 const peakThreshold = 0.6;
 const categoryColor = {
@@ -40,6 +50,9 @@ const categoryColor = {
   "其他": "#9E9E9E"
 };
 
+
+
+// 
 function showEvent(event, fromAutoplay = false) {
   let imageIndex = 0;
   if (!fromAutoplay) {
@@ -53,41 +66,15 @@ function showEvent(event, fromAutoplay = false) {
 
   const display = d3.select("#event-display").html("");
   const box = display.append("div").attr("class", "event-box");
+  const mediaBox = box.append("div").attr("class", "media-carousel");
+
   box.append("h2").text(event.title);
   box.append("p").text(event.description);
-  // 多张图片，模态
-  if (event.video) {
-  box.append("video")
-    .attr("src", event.video)
-    .attr("controls", true)
-    .attr("autoplay", true)
-    .style("max-width", "100%");
-} else if (event.image) {
-  if (Array.isArray(event.image)) {
-    let img = box.append("img")
-      .attr("src", event.image[0])
-      .style("max-width", "100%");
-    
-    if (event.image.length > 1) {
-      let imageIndex = 0;
-      const interval = setInterval(() => {
-        if (events[currentIndex] !== event) {
-          clearInterval(interval);
-          return;
-        }
-        imageIndex = (imageIndex + 1) % event.image.length;
-        img.attr("src", event.image[imageIndex]);
-      }, 2000);
-    }
+  // box中多张图片，模态，滚动呈现
 
-  } else {
-    box.append("img")
-      .attr("src", event.image)
-      .style("max-width", "100%");
-  }
-}
-  // if (event.images) {
-  //   event.images.forEach(img => box.append("img").attr("src", "images/" + img));
+  
+  // if (event.image) {
+  //   event.image.forEach(img => box.append("img").attr("src", "images/" + img));
   // }
 
   // if (event.video) {
@@ -96,9 +83,98 @@ function showEvent(event, fromAutoplay = false) {
   //     .attr("controls", true)
   //     .attr("autoplay", true);
   // }
+//   if (event.image) {
+//   event.image.forEach(img =>
+//     mediaBox.append("img")
+//       .attr("src", "images/" + img)
+//       .attr("class", "media-item")
+//   );
+// }
+
+// if (event.video) {
+//   mediaBox.append("video")
+//     .attr("src", "videos/" + event.video)
+//     .attr("class", "media-item")
+//     .attr("controls", true);
+// }
+
+const mediaContainer = box.append("div").attr("id", "media-container");
+const controlBox = box.append("div").attr("class", "media-controls");
+
+controlBox.append("button")
+  .text("⏮️ 上一张")
+  .on("click", () => {
+    mediaIndex = (mediaIndex - 1 + mediaItems.length) % mediaItems.length;
+    showMediaItem(mediaIndex);
+  });
+
+controlBox.append("button")
+  .text("⏭️ 下一张")
+  .on("click", () => {
+    nextMedia();
+  });
+
+let mediaItems = [];
+if (event.image) {
+  event.image.forEach(img => {
+    mediaItems.push({ type: "image", src: "images/" + img });
+  });
+}
+if (event.video) {
+  mediaItems.push({ type: "video", src: "videos/" + event.video });
+}
+
+let mediaIndex = 0;
+
+function showMediaItem(index) {
+  mediaContainer.html(""); // 清空容器
+  const item = mediaItems[index];
+
+  if (item.type === "image") {
+    mediaContainer.append("img")
+      .attr("src", item.src)
+      .attr("class", "media-display");
+    scheduleNext();
+  } else if (item.type === "video") {
+    const video = mediaContainer.append("video")
+      .attr("src", item.src)
+      .attr("class", "media-display")
+      .attr("controls", true)
+      .attr("autoplay", true)
+      .node();
+
+    video.onended = () => {
+      nextMedia();
+    };
+  }
+}
+
+function nextMedia() {
+  mediaIndex = (mediaIndex + 1) % mediaItems.length;
+  showMediaItem(mediaIndex);
+}
+
+let mediaTimer = null;
+function scheduleNext() {
+  clearTimeout(mediaTimer);
+  mediaTimer = setTimeout(() => {
+    nextMedia();
+  }, 4000); // 图片 4 秒切换
+}
+
+if (mediaItems.length > 0) {
+  showMediaItem(mediaIndex);
+}
+
+
 
 }
 
+
+
+
+// 设置自动播放events中的内容
+let intervalId = null;
 function startAutoPlay() {
   stopAutoPlay();
   isManualInterruption = false; // 重置标志
