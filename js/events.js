@@ -4,8 +4,9 @@ const events = [
   {
     title: "选秀起点：高中生的逆袭",
     description: "以高中生身份第 13 顺位被黄蜂选中，交易至湖人开启传奇生涯。",
-    time: new Date("1996-06-26"),
-    peak: 0.85,  // 高于临界值，属于核心事件
+    starT: new Date("1996-06-26"),
+    end: new Date("1996-06-26"),
+    peak: 0.65,  // 高于临界值，属于核心事件
     category: "职业",
     image: ["1-1.png","1-2.jpg"],
     video: "1-3.mp4"
@@ -13,37 +14,73 @@ const events = [
   {
     title: "扣篮大赛：初露锋芒",
     description: "全明星周末斩获扣篮大赛冠军（19 岁，NBA 历史最年轻扣篮王），新秀赛 31 分创纪录。",
-    time: new Date("1997-02-08"),
-    
-    peak: 0.9,
+    start: new Date("1997-02-08"),
+    end: new Date("1997-02-08"),
+    peak: 0.7,
     category: "职业",
-    image: "family1.jpg"
+    image:[ "扣篮.gif","扣篮1.gif", "扣篮2.gif", "扣篮3.gif"],
   },
   {
   title: "三连冠：从副手到核心",
   description: "从替补到首发，总决赛 G4 带伤扭转战局，率队完成 “湖人三连冠”，成长为球队核心",
-  time: new Date("2000"),
+  start: new Date("2000-01-01"),
+  end: new Date("2000-12-31"),
   // 如何生成时间段
   peak: 0.8,
-  category: "家庭",
-  images: ["pic1.jpg", "pic2.jpg"],
-  video: "video1.mp4"
+  category: "职业",
+  images: ["2-1.jpg", "2-2.jpg"]
   },
   {
-    title: "志愿者活动",
-    description: "参与环保公益组织，为城市清洁做出贡献。",
-    time: new Date("2020-09-15"),
+    title: "舆论危机：形象重创",
+    description: "深陷 “鹰郡事件” 性侵指控，虽刑事诉讼撤销但形象重创，赛季报销 + 商业代言流失",
+    start: new Date("2003-01-01"),
+    end: new Date("2003-12-31"),
     peak: 0.4,  // 低于临界值，放在外圈
     category: "社会责任",
-    image: "social1.jpg"
+    video: "3.mp4"
   },
   {
-    title: "发起创业项目",
-    description: "成立个人创业公司。",
-    time: new Date("2021-01-01"),
-    peak: 0.7,
+    title: "F4 折戟：团队的困境",
+    description: "“F4 豪华阵容”（奥尼尔、科比、马龙、佩顿）总决赛爆冷负于活塞，科比命中率仅 38.1%，被批 “毒瘤”",
+    start: new Date("2004-01-01"),
+    end: new Date("2004-12-31"),
+    peak: 0.4,
+    category: "职业"
+  },
+  {
+    title: "81 分奇迹：进攻火力全开",
+    description: "对阵猛龙狂砍 81 分（NBA 历史单场第二高分），诠释 “曼巴精神” 极致进攻能力",
+    start: new Date("2006-01-22"),
+    end: new Date("2006-01-22"),
+    peak: 0.85,
     category: "职业",
-    video: "startup.mp4"
+    image: ["4-1.png"]
+  },
+  {
+    title: "季后赛边缘：独木难支",
+    description: "连续两年无缘季后赛，单赛季场均 31.6 分仍独木难支，球队重建期陷入 “科比去哪儿” 交易传闻漩涡s",
+    start: new Date("2006-01-01"),
+    end: new Date("2007-12-31"),
+    peak: 0.4,
+    category: "职业"
+  },
+  {
+    title:"绿军阻击：错失巅峰一冠",
+    description: "总决赛负于凯尔特人 “三巨头”，科比场均 25.7 分但关键战失误频发，错失 “单季 MVP + 总冠军” 双料登顶机会",
+    start: new Date("2008-01-01"),
+    end: new Date("2008-12-31"),
+    peak: 0.4,
+    category: "职业"
+  },
+  {
+    title:"两连冠：复仇与巅峰",
+    description:"连续两年夺冠，2010 年总决赛击败凯尔特人复仇成功，斩获个人第 5 冠并蝉联 FMVP，跻身历史顶级球星",
+    start: new Date("2009-01-01"),
+    end: new Date("2010-12-31"),
+    peak: 0.9,
+    category: "职业",
+    image: ["5-1.jpg", "5-2.jpg"]
   }
+
   
 ];
