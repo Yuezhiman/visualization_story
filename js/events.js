@@ -28,7 +28,7 @@ const events = [
   // 如何生成时间段
   peak: 0.8,
   category: "职业",
-  images: ["2-1.jpg", "2-2.jpg"]
+  images: ["2-1.jpg", "2-2.jpg","2-3.png"]
   },
   {
     title: "舆论危机：形象重创",
@@ -46,6 +46,7 @@ const events = [
     end: new Date("2004-12-31"),
     peak: 0.4,
     category: "职业"
+    images: ["3-1.png","3-2.png"]
   },
   {
     title: "81 分奇迹：进攻火力全开",
@@ -54,7 +55,7 @@ const events = [
     end: new Date("2006-01-22"),
     peak: 0.85,
     category: "职业",
-    image: ["4-1.png"]
+    image: ["4-1.png","4-2.png","4-3.png"]
   },
   {
     title: "季后赛边缘：独木难支",
@@ -87,7 +88,7 @@ const events = [
     end: new Date("2016-04-13"),
     peak: 0.95,
     category: "职业",
-    image: "11.jpg",
+    image: "11.jpg","11-2.png"
     video:"11.mp4"
   },
   {
