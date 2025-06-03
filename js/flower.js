@@ -77,6 +77,7 @@ function renderFlowerPlot() {
     .attr("text-anchor", "middle")
     .attr("font-size", "14px")
     .attr("fill", "#a0a0d0");
+  
 
   // 分离内部和外部事件
   const inside = events.filter(d => d.peak >= peakThreshold);
@@ -141,7 +142,6 @@ function renderFlowerPlot() {
     .on("click", function(event, d) {
       showEvent(d);
     });
-    
   // 动画效果
   nodes.transition()
     .duration(1200)
@@ -151,26 +151,67 @@ function renderFlowerPlot() {
     .attr("r", d => 6 + d.peak * 6)
     .attr("opacity", 1);
     
-  // 添加事件标题
-  svg.selectAll(".flower-label")
+  // // 添加事件标题
+  // svg.selectAll(".flower-label")
+  //   .data(all)
+  //   .enter()
+  //   .append("text")
+  //   .attr("class", "flower-label")
+  //   .attr("x", center.x)
+  //   .attr("y", center.y)
+  //   .attr("text-anchor", "middle")
+  //   .attr("font-size", "10px")
+  //   .attr("fill", "rgba(0, 0, 0, 0)")
+  //   .attr("pointer-events", "none")
+  //   .text(d => d.title)
+  //   .transition()
+  //   .delay(1000)
+  //   .duration(500)
+  //   .attr("x", d => d.x)
+  //   .attr("y", d => d.y + (d.peak >= peakThreshold ? 25 : 30))
+  //   .attr("fill", "rgba(0, 0, 0, 0.8)");
+
+svg.selectAll(".flower-label")
     .data(all)
     .enter()
     .append("text")
     .attr("class", "flower-label")
-    .attr("x", center.x)
-    .attr("y", center.y)
-    .attr("text-anchor", "middle")
-    .attr("font-size", "10px")
-    .attr("fill", "rgba(0, 0, 0, 0)")
-    .attr("pointer-events", "none")
-    .text(d => d.title)
-    .transition()
-    .delay(1000)
-    .duration(500)
     .attr("x", d => d.x)
-    .attr("y", d => d.y + (d.peak >= peakThreshold ? 25 : 30))
-    .attr("fill", "rgba(0, 0, 0, 0.8)");
+    .attr("y", d => d.y)
+    .attr("text-anchor", d => {
+      const angle = Math.atan2(d.y - center.y, d.x - center.x);
+      return (angle > -Math.PI / 2 && angle < Math.PI / 2) ? "start" : "end";
+    })
+    .attr("dx", d => {
+      const angle = Math.atan2(d.y - center.y, d.x - center.x);
+      return (angle > -Math.PI / 2 && angle < Math.PI / 2) ? 12 : -12;
+    })
+    .attr("dy", "0.35em")
+    .attr("font-size", "10px")
+    .attr("fill", "rgba(0, 0, 0, 0.8)")
+    .each(function(d) {
+      const textLines = d.title.split("："); // 按冒号分段
+    const self = d3.select(this); // 获取当前text元素
+    const anchor = self.attr("text-anchor");
+    const dx = parseFloat(self.attr("dx"));
 
+    // 清除旧的 tspans
+    self.selectAll("tspan").remove();
+
+    textLines.forEach((line, i) => {
+      self.append("tspan")
+        .attr("x", () => {
+          // 根据text-anchor和dx计算x坐标
+          if (anchor === "start") {
+            return d.x + dx;
+          } else { // end
+            return d.x - dx;
+          }
+        })
+        .attr("dy", i === 0 ? "0em" : "1.2em") // 第一行不偏移，后续每行下移
+        .text(line);
+    });
+    });
   // 图例
    const legend = svg.append("g")
     .attr("transform", `translate(20, ${height - 100})`);

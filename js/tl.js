@@ -110,20 +110,13 @@ timeline.selectAll(".tick")
     .attr("width", d => Math.max(2, x(d.end) - x(d.start)))
     .attr("fill", "#aaa")
     .on("click", (e, d) => showEvent(d));
-  // 🏀 事件图标及标签（用箭头指向）
+
   const markers = timeline.selectAll(".event-marker")
     .data(events)
     .enter()
     .append("g")
     .attr("transform", d => `translate(${x(d.start)}, 180)`)
     .on("click", (e, d) => showEvent(d));
-
-  // 🏀 图标（篮球）
-  markers.append("text")
-    .attr("text-anchor", "middle")
-    .attr("font-size", "20px")
-    .attr("y", 0)
-    .text("🏀");
 
 markers
   .on("mouseover", function(e, d) {
@@ -184,4 +177,13 @@ markers
     const walk = (xPos - startX) * 1.5;
     timelineDiv.scrollLeft = scrollLeft - walk;
   });
+  // 播放图标🏀，初始位置在第一个事件
+const playhead = timeline.append("text")
+  .attr("id", "playhead")
+  .attr("text-anchor", "middle")
+  .attr("font-size", "24px")
+  .attr("x", x(events[0].start))
+  .attr("y", 180)
+  .text("🏀");
+
 }

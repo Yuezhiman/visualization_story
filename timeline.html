@@ -49,8 +49,6 @@ const categoryColor = {
 };
 
 
-
-
 function showEvent(event, fromAutoplay = false) {
   let imageIndex = 0;
   if (!fromAutoplay) {
@@ -58,7 +56,16 @@ function showEvent(event, fromAutoplay = false) {
     stopAutoPlay();
     isManualInterruption = true;
   }
-
+  // 移动播放图标到当前事件位置（时间线）
+const playhead = d3.select("#playhead");
+if (!playhead.empty()) {
+  playhead.transition()
+    .duration(800)
+    .ease(d3.easeCubicInOut)
+    .attr("x", d3.scaleTime()
+      .domain([d3.min(events, d => d.start), d3.max(events, d => d.end)])
+      .range([60, 2000 - 60])(event.start));
+}
   d3.selectAll(".event-marker").classed("active", e => e === event);
   d3.selectAll(".flower-node").classed("active", e => e === event);
 
@@ -68,34 +75,6 @@ function showEvent(event, fromAutoplay = false) {
 
   box.append("h2").text(event.title);
   box.append("p").text(event.description);
-  // box中多张图片，模态，滚动呈现
-
-  
-  // if (event.image) {
-  //   event.image.forEach(img => box.append("img").attr("src", "images/" + img));
-  // }
-
-  // if (event.video) {
-  //   box.append("video")
-  //     .attr("src", "videos/" + event.video)
-  //     .attr("controls", true)
-  //     .attr("autoplay", true);
-  // }
-//   if (event.image) {
-//   event.image.forEach(img =>
-//     mediaBox.append("img")
-//       .attr("src", "images/" + img)
-//       .attr("class", "media-item")
-//   );
-// }
-
-// if (event.video) {
-//   mediaBox.append("video")
-//     .attr("src", "videos/" + event.video)
-//     .attr("class", "media-item")
-//     .attr("controls", true);
-// }
-
 const mediaContainer = box.append("div").attr("id", "media-container");
 const controlBox = box.append("div").attr("class", "media-controls");
 
@@ -123,7 +102,6 @@ if (event.video) {
 }
 
 let mediaIndex = 0;
-
 function showMediaItem(index) {
   mediaContainer.html(""); // 清空容器
   const item = mediaItems[index];
@@ -131,7 +109,9 @@ function showMediaItem(index) {
   if (item.type === "image") {
     mediaContainer.append("img")
       .attr("src", item.src)
-      .attr("class", "media-display");
+      .attr("class", "media-display")
+      .style("cursor", "zoom-in")
+      .on("click", () => showModal(item));
     scheduleNext();
   } else if (item.type === "video") {
     const video = mediaContainer.append("video")
@@ -139,6 +119,8 @@ function showMediaItem(index) {
       .attr("class", "media-display")
       .attr("controls", true)
       .attr("autoplay", true)
+      .style("cursor", "zoom-in")
+      .on("click", () => showModal(item))
       .node();
 
     video.onended = () => {
@@ -146,6 +128,7 @@ function showMediaItem(index) {
     };
   }
 }
+
 
 function nextMedia() {
   mediaIndex = (mediaIndex + 1) % mediaItems.length;
@@ -163,6 +146,12 @@ function scheduleNext() {
 if (mediaItems.length > 0) {
   showMediaItem(mediaIndex);
 }
+const timelineDiv = document.getElementById("timeline");
+const playheadX = d3.select("#playhead").attr("x");
+timelineDiv.scrollTo({
+  left: playheadX - timelineDiv.clientWidth / 2,
+  behavior: "smooth"
+});
 
 
 
@@ -197,125 +186,78 @@ document.addEventListener("DOMContentLoaded", () => {
   renderTimeline();
   showEvent(events[0]);
   startAutoPlay();
+
+  // 模态关闭事件绑定
+  document.getElementById("modal-close").addEventListener("click", () => {
+    document.getElementById("media-modal").style.display = "none";
+  });
+
+  document.getElementById("media-modal").addEventListener("click", (e) => {
+    if (e.target.id === "media-modal") {
+      document.getElementById("media-modal").style.display = "none";
+    }
+  });
+
 });
+function showModal(item) {
+  const modal = d3.select("#media-modal");
+  const content = d3.select("#modal-content");
+  content.html(""); // 清空内容
+
+  if (item.type === "image") {
+      content.append("img")
+        .attr("src", item.src)
+        .attr("class", "modal-media");
+
+    // content.append("img")
+    //   .attr("src", item.src)
+    //   .style("max-width", "100%")
+    //   .style("max-height", "100%")
+    //   .style("border-radius", "10px");
+  } else if (item.type === "video") {
+        content.append("video")
+          .attr("src", item.src)
+          .attr("class", "modal-media")
+          .attr("controls", true)
+          .attr("autoplay", true);
+
+    // content.append("video")
+    //   .attr("src", item.src)
+    //   .attr("controls", true)
+    //   .attr("autoplay", true)
+    //   .style("max-width", "100%")
+    //   .style("max-height", "100%")
+    //   .style("border-radius", "10px");
+  }
+
+  modal.style("display", "flex");
+}
+
+document.getElementById("modal-close").addEventListener("click", () => {
+  document.getElementById("media-modal").style.display = "none";
+});
+
+document.getElementById("media-modal").addEventListener("click", (e) => {
+  if (e.target.id === "media-modal") {
+    document.getElementById("media-modal").style.display = "none";
+  }
+});
+
+
 </script>
 
 </body>
+
+<div id="media-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+  background: rgba(0,0,0,0.7); z-index: 9999; justify-content: center; align-items: center;">
+  <div id="modal-content" style="position: relative; max-width: 90%; max-height: 90%;">
+    <span id="modal-close" style="position:absolute; top:10px; right:20px; font-size:30px; color:white; cursor:pointer;">×</span>
+    
+  </div>
+  
+</div>
+
+
+
 </html>
-<!--  function renderTimeline() {
-  const timeline = d3.select("#timeline").append("svg")
-    .attr("width", 2000)
-    .attr("height", 200);
-
-  const x = d3.scaleTime()
-    .domain(d3.extent(events, d => d.time))
-    .range([60, 1940]);
-
-  const area = d3.area()
-    .x(d => x(d.time))
-    .y0(200)
-    .y1(d => 200 - (d.peak || 0) * 100);
-
-  timeline.append("path")
-    .datum(events)
-    .attr("class", "mountain")
-    .attr("d", area);
-
-  timeline.append("g")
-    .attr("transform", "translate(0,180)")
-    .call(d3.axisBottom(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat("%Y")));
-
-  const markers = timeline.selectAll(".event-marker")
-    .data(events)
-    .enter()
-    .append("g")
-    .attr("transform", d => `translate(${x(d.time)},140)`)
-    .on("click", (e, d) => showEvent(d));
-
-  markers.append("rect")
-    .attr("class", "event-marker")
-    .attr("x", -25)
-    .attr("y", -25)
-    .attr("width", 50)
-    .attr("height", 50)
-    .attr("rx", 6)
-    .attr("ry", 6);
-
-  markers.append("text")
-    .attr("class", "marker-label")
-    .attr("y", 5)
-    .text(d => d.title);
-
-  let isDragging = false;
-  let startX = 0;
-  let scrollLeft = 0;
-
-  const timelineDiv = document.getElementById("timeline");
-  timelineDiv.style.overflowX = "auto";
-
-  timelineDiv.addEventListener("mousedown", e => {
-    isDragging = true;
-    startX = e.pageX - timelineDiv.offsetLeft;
-    scrollLeft = timelineDiv.scrollLeft;
-  });
-
-  timelineDiv.addEventListener("mouseleave", () => isDragging = false);
-  timelineDiv.addEventListener("mouseup", () => isDragging = false);
-  timelineDiv.addEventListener("mousemove", e => {
-    if (!isDragging) return;
-    const x = e.pageX - timelineDiv.offsetLeft;
-    const walk = (x - startX) * 1.5;
-    timelineDiv.scrollLeft = scrollLeft - walk;
-  });
-}
-渲染花朵图
-function renderFlowerPlot() {
-  const width = 400;
-  const height = 400;
-  const center = { x: width / 2, y: height / 2 };
-  const radius = 100;
-
-  const svg = d3.select("#flower-plot")
-    .append("svg")
-    .attr("width", width)
-    .attr("height", height);
-
-  svg.append("circle")
-    .attr("cx", center.x)
-    .attr("cy", center.y)
-    .attr("r", radius)
-    .attr("fill", "none")
-    .attr("stroke", "#aaa")
-    .attr("stroke-width", 2);
-
-  const inside = events.filter(d => d.peak >= peakThreshold);
-  const outside = events.filter(d => d.peak < peakThreshold);
-
-  inside.forEach((d, i) => {
-    const angle = 2 * Math.PI * i / inside.length;
-    d.x = center.x + radius * 0.5 * Math.cos(angle);
-    d.y = center.y + radius * 0.5 * Math.sin(angle);
-  });
-
-  outside.forEach((d, i) => {
-    const angle = 2 * Math.PI * i / outside.length;
-    d.x = center.x + radius * 1.4 * Math.cos(angle);
-    d.y = center.y + radius * 1.4 * Math.sin(angle);
-  });
-
-  const all = [...inside, ...outside];
-
-  svg.selectAll(".flower-node")
-    .data(all)
-    .enter()
-    .append("circle")
-    .attr("class", "flower-node")
-    .attr("cx", d => d.x)
-    .attr("cy", d => d.y)
-    .attr("r", 10)
-    .attr("fill", d => categoryColor[d.category] || categoryColor["其他"])
-    .on("click", (e, d) => {
-      showEvent(d);
-    });
- } -->
 
