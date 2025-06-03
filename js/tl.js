@@ -26,32 +26,77 @@ function renderTimeline() {
    console.log("Events with peak values:", events.map(e => ({title: e.title, peak: e.peak})));
   // 渐变色定义
   const defs = timeline.append("defs");
+  // const gradient = defs.append("linearGradient")
+  //   .attr("id", "mountain-gradient")
+  //   .attr("x1", "0%").attr("x2", "0%")
+  //   .attr("y1", "0%").attr("y2", "100%");
+
+  // gradient.selectAll("stop")
+  //   .data([
+  //     { offset: "0%", color: "#80c1ff" },
+  //     { offset: "100%", color: "#ffffff" }
+  //   ])
+  //   .enter()
+  //   .append("stop")
+  //   .attr("offset", d => d.offset)
+  //   .attr("stop-color", d => d.color);
+  // // 山峰区域图
+  // timeline.append("path")
+  //   .datum(events)
+  //   .attr("class", "mountain")
+  //   .attr("d", area)
+  //   .attr("fill", "url(#mountain-gradient)");
+    // 在 defs 中定义一个更丰富的渐变
   const gradient = defs.append("linearGradient")
-    .attr("id", "mountain-gradient")
-    .attr("x1", "0%").attr("x2", "0%")
-    .attr("y1", "0%").attr("y2", "100%");
+    .attr("id", "mountain-gradient-enhanced")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "0%").attr("y2", "100%");
 
-  gradient.selectAll("stop")
-    .data([
-      { offset: "0%", color: "#80c1ff" },
-      { offset: "100%", color: "#ffffff" }
-    ])
-    .enter()
-    .append("stop")
-    .attr("offset", d => d.offset)
-    .attr("stop-color", d => d.color);
+  gradient.append("stop").attr("offset", "0%").attr("stop-color", "#aeeaff");
+  gradient.append("stop").attr("offset", "50%").attr("stop-color", "#89cfff");
+  gradient.append("stop").attr("offset", "100%").attr("stop-color", "#ffffff");
 
-  // 山峰区域图
+  // 山峰路径增加 stroke 描边
   timeline.append("path")
     .datum(events)
     .attr("class", "mountain")
     .attr("d", area)
-    .attr("fill", "url(#mountain-gradient)");
+    .attr("fill", "url(#mountain-gradient-enhanced)")
+    .attr("stroke", "#4aa6ff")
+    .attr("stroke-width", 1);
 
-  // 时间轴
-  timeline.append("g")
-    .attr("transform", "translate(0,180)")
-    .call(d3.axisBottom(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat("%Y")));
+  
+    // 时间轴
+const xAxis = d3.axisBottom(x)
+  .ticks(d3.timeYear.every(1))
+  .tickFormat(d3.timeFormat("%Y"));
+
+timeline.append("g")
+  .attr("transform", "translate(0,180)")
+  .call(xAxis)
+  .selectAll("text")
+    .style("font-size", "12px")
+    .style("fill", "#333")
+    .style("font-family", "Arial");
+
+// 刻度线加粗并设置颜色
+timeline.selectAll(".tick line")
+  .attr("stroke", "#ccc")
+  .attr("stroke-width", 1);
+
+// 可选：添加横纵网格线
+timeline.selectAll(".tick")
+  .append("line")
+  .attr("x1", 0)
+  .attr("y1", -svgHeight + 20)
+  .attr("x2", 0)
+  .attr("y2", 0)
+  .attr("stroke", "#eee")
+  .attr("stroke-width", 1);
+  // // 时间轴
+  // timeline.append("g")
+  //   .attr("transform", "translate(0,180)")
+  //   .call(d3.axisBottom(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat("%Y")));
 
   // 时间段横条
   timeline.selectAll(".duration-bar")
@@ -80,7 +125,15 @@ function renderTimeline() {
     .attr("y", 0)
     .text("🏀");
 
-
+markers
+  .on("mouseover", function(e, d) {
+    d3.select(this).select("circle").attr("r", 15).attr("fill", "#e0f7ff");
+    d3.select(this).select("text").attr("font-size", "20px");
+  })
+  .on("mouseout", function(e, d) {
+    d3.select(this).select("circle").attr("r", 12).attr("fill", "#f9f9f9");
+    d3.select(this).select("text").attr("font-size", "16px");
+  });
 
     // 在 timeline svg 内创建一个篮球图标（只一个）
   // ⬆️ 标签文字

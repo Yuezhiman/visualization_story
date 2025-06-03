@@ -80,6 +80,42 @@ const events = [
     peak: 0.9,
     category: "职业",
     image: ["5-1.jpg", "5-2.jpg"]
+  },{
+    title: "谢幕战：60 分的绝唱",
+    description: "退役战狂砍 60 分逆转爵士，以 “历史最华丽谢幕” 告别赛场",
+    start: new Date("2016-04-13"),
+    end: new Date("2016-04-13"),
+    peak: 0.95,
+    category: "职业",
+    image: "11.jpg",
+    video:"11.mp4"
+  },
+  {
+    title: "跨界荣耀：奥斯卡折桂",
+    description: "动画短片《亲爱的篮球》获奥斯卡最佳动画短片奖，跨界破圈",
+    start: new Date("2018-01-01"),
+    end: new Date("2018-12-31"),
+    peak: 0.9,
+    category: "社会责任",
+    video: "12.mp4"
+  },
+  {
+    title: "永恒缅怀：精神的延续",
+    description: "因直升机事故意外离世，全球万人空巷悼念",
+    start: new Date("2020-01-26"),
+    end: new Date("2020-01-26"),
+    peak: 0.9,
+    category: "职业",
+    image: ["13-1.jpeg","13-1.jpg"],
+    video: "13-1.mp4"
+  },{
+    title: "名人堂加冕：历史的肯定",
+    description: "入选奈史密斯篮球名人堂（以球员身份首次提名即入选），职业生涯盖棺定论",
+    start: new Date("2020-04-01"),
+    end: new Date("2020-04-30"),
+    peak: 0.85,
+    category: "社会责任",
+    image: ["14-1.png", "14-2.jpg", "14-3.jpg"]
   }
 
   
