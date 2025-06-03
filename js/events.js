@@ -4,7 +4,7 @@ const events = [
   {
     title: "选秀起点：高中生的逆袭",
     description: "以高中生身份第 13 顺位被黄蜂选中，交易至湖人开启传奇生涯。",
-    starT: new Date("1996-06-26"),
+    start: new Date("1996-06-26"),
     end: new Date("1996-06-26"),
     peak: 0.65,  // 高于临界值，属于核心事件
     category: "职业",

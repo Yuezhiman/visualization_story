@@ -23,7 +23,7 @@ function renderTimeline() {
     .y1(d => svgHeight - (d.peak || 0) * 100)
     .curve(d3.curveMonotoneX); // 使用平滑曲线
     // 使用曲线插值使山峰更平滑
-
+   console.log("Events with peak values:", events.map(e => ({title: e.title, peak: e.peak})));
   // 渐变色定义
   const defs = timeline.append("defs");
   const gradient = defs.append("linearGradient")
@@ -104,29 +104,6 @@ function renderTimeline() {
     });
   });
 
-  // const label =markers.append("text")
-  //   .attr("y", (d, i) => i % 2 === 0 ? -45 : -70) // 上下交错
-  //   .attr("text-anchor", "middle")
-  //   .attr("font-size", "12px")
-  //   .attr("font-family", "sans-serif")
-  //   .attr("fill", "#000")
-  //   .text(d => d.title.length > 6 ? d.title.slice(0, 6) + "…" : d.title);
-  // markers.each(function(d) {
-  //   const text = d.title.split("："); // 分成多行，如：["奥运危机", "形成影响"]
-  //   text.forEach((line, i) => {
-  //     d3.select(this).append("tspan")
-  //       .attr("x", 0)
-  //       .attr("dy", i === 0 ? 0 : "1.2em")
-  //       .text(line);
-  //   });
-  // });
-  // markers.append("text")
-  //   .attr("class", "marker-label")
-  //   .attr("text-anchor", "middle")
-  //   .attr("font-size", "10px")
-  //   .attr("fill", "#000")
-  //   .attr("y", -35)
-  //   .text(d => d.title.length > 6 ? d.title.slice(0, 6) + "…" : d.title);
 
   // ⬆️ 箭头线条
   markers.append("line")
