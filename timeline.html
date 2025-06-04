@@ -40,6 +40,7 @@ let isManualInterruption = false;
 
 
 
+
 const peakThreshold = 0.6;
 const categoryColor = {
   "职业": "#4CAF50",
@@ -114,20 +115,72 @@ function showMediaItem(index) {
       .on("click", () => showModal(item));
     scheduleNext();
   } else if (item.type === "video") {
-    const video = mediaContainer.append("video")
-      .attr("src", item.src)
-      .attr("class", "media-display")
-      .attr("controls", true)
-      .attr("autoplay", true)
-      .style("cursor", "zoom-in")
-      .on("click", () => showModal(item))
-      .node();
+  const video = document.createElement("video");
+  video.src = item.src;
+  video.className = "media-display";
+  video.controls = true;
+  video.muted = true; // 关键：必须静音才能 autoplay
+  video.playsInline = true; // iOS 上防止全屏
+  video.style.cursor = "zoom-in";
 
-    video.onended = () => {
-      nextMedia();
-    };
-  }
+  video.onclick = () => showModal(item);
+
+  // 清空后插入
+  mediaContainer.html("");
+  mediaContainer.node().appendChild(video);
+
+  // 播放并捕获结果
+  video.addEventListener("loadeddata", () => {
+    const playPromise = video.play();
+    if (playPromise !== undefined) {
+      playPromise
+        .then(() => {
+          // 播放成功
+        })
+        .catch(error => {
+          console.warn("自动播放失败：", error);
+        });
+    }
+  });
+
+  video.onended = () => {
+    currentIndex = (currentIndex + 1) % events.length;
+    showEvent(events[currentIndex], true); // 自动跳下一个
+    
+  };
 }
+
+  // else if (item.type === "video") {
+  //   const video = mediaContainer.append("video")
+  //     .attr("src", item.src)
+  //     .attr("class", "media-display")
+  //     .attr("controls", true)
+  //     .attr("muted", true)
+  //     .style("cursor", "zoom-in")
+  //     .on("click", () => showModal(item))
+  //     .node();
+  //   video.play().then(() => {
+  //       // 播放成功
+  //     }).catch(err => {
+  //       console.warn("自动播放失败：", err);
+  //     });
+
+  //   // video.onended = () => {
+  //   //   nextMedia();
+  //   // };
+  //   video.onended = () => {
+  //     //  currentIndex = (currentIndex + 1) % events.length;
+  //     //   playNextEvent();
+  //   // 如果是自动播放状态，则进入下一条事件
+  //     if (!isManualInterruption) {
+  //       currentIndex = (currentIndex + 1) % events.length;
+  //       playNextEvent();
+  //     } else {
+  //       nextMedia(); // 手动状态下正常播放下一媒体
+  //     }
+  //   };
+
+  }
 
 
 function nextMedia() {
@@ -141,6 +194,8 @@ function scheduleNext() {
   mediaTimer = setTimeout(() => {
     nextMedia();
   }, 4000); // 图片 4 秒切换
+ 
+
 }
 
 if (mediaItems.length > 0) {
@@ -162,16 +217,47 @@ timelineDiv.scrollTo({
 
 // 设置自动播放events中的内容
 let intervalId = null;
+// function startAutoPlay() {
+//   stopAutoPlay();
+//   isManualInterruption = false; // 重置标志
+
+//   autoplayTimer = setInterval(() => {
+//     if (!isManualInterruption) {
+//       showEvent(events[currentIndex], true); // 自动播放用 true
+//       currentIndex = (currentIndex + 1) % events.length;
+//     }
+//   }, 5000);
+// }
 function startAutoPlay() {
   stopAutoPlay();
-  isManualInterruption = false; // 重置标志
+  isManualInterruption = false;
+  currentIndex = 0;
+  playNextEvent();
+}
 
-  autoplayTimer = setInterval(() => {
-    if (!isManualInterruption) {
-      showEvent(events[currentIndex], true); // 自动播放用 true
+
+
+
+function playNextEvent() {
+  if (isManualInterruption) return;
+
+  const event = events[currentIndex];
+  showEvent(event, true); // 自动播放用 true
+
+  // 判断是 image 还是 video
+  let hasVideo = event.video ? true : false;
+
+  if (hasVideo) {
+    // 由 video 的 ended 回调触发下一次播放
+    // 不设定 timeout
+    // showEvent 中 video.onended 会调用 playNextEvent()
+  } else {
+    // 图片轮播，设定 5 秒后自动切换
+    autoplayTimer = setTimeout(() => {
       currentIndex = (currentIndex + 1) % events.length;
-    }
-  }, 5000);
+      playNextEvent();
+    }, 5000);
+  }
 }
 
 
@@ -180,7 +266,11 @@ function stopAutoPlay() {
     clearInterval(autoplayTimer);
     autoplayTimer = null;
   }
+  isAutoPlaying = false;
 }
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
   renderFlowerPlot();
   renderTimeline();
