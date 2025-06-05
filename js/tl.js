@@ -26,27 +26,6 @@ function renderTimeline() {
    console.log("Events with peak values:", events.map(e => ({title: e.title, peak: e.peak})));
   // 渐变色定义
   const defs = timeline.append("defs");
-  // const gradient = defs.append("linearGradient")
-  //   .attr("id", "mountain-gradient")
-  //   .attr("x1", "0%").attr("x2", "0%")
-  //   .attr("y1", "0%").attr("y2", "100%");
-
-  // gradient.selectAll("stop")
-  //   .data([
-  //     { offset: "0%", color: "#80c1ff" },
-  //     { offset: "100%", color: "#ffffff" }
-  //   ])
-  //   .enter()
-  //   .append("stop")
-  //   .attr("offset", d => d.offset)
-  //   .attr("stop-color", d => d.color);
-  // // 山峰区域图
-  // timeline.append("path")
-  //   .datum(events)
-  //   .attr("class", "mountain")
-  //   .attr("d", area)
-  //   .attr("fill", "url(#mountain-gradient)");
-    // 在 defs 中定义一个更丰富的渐变
   const gradient = defs.append("linearGradient")
     .attr("id", "mountain-gradient-enhanced")
     .attr("x1", "0%").attr("y1", "0%")
@@ -94,9 +73,6 @@ timeline.selectAll(".tick")
   .attr("stroke", "#eee")
   .attr("stroke-width", 1);
   // // 时间轴
-  // timeline.append("g")
-  //   .attr("transform", "translate(0,180)")
-  //   .call(d3.axisBottom(x).ticks(d3.timeYear.every(1)).tickFormat(d3.timeFormat("%Y")));
 
   // 时间段横条
   timeline.selectAll(".duration-bar")
@@ -128,10 +104,6 @@ markers
     d3.select(this).select("text").attr("font-size", "16px");
   });
 
-    // 在 timeline svg 内创建一个篮球图标（只一个）
-  // ⬆️ 标签文字
-  // 原来的 marker.append("text") 
-  // 先创建空文本元素，不设置 text()
   const label = markers.append("text")
     .attr("y", (d, i) => i % 2 === 0 ? -45 : -70) // 上下交错
     .attr("text-anchor", "middle")

@@ -44,7 +44,7 @@ const events = [
     description: "“F4 豪华阵容”（奥尼尔、科比、马龙、佩顿）总决赛爆冷负于活塞，科比命中率仅 38.1%，被批 “毒瘤”",
     start: new Date("2004-01-01"),
     end: new Date("2004-12-31"),
-    peak: 0.4,
+    peak: 0.3,
     category: "职业",
     image: ["3-1.png","3-2.png"]
   },
@@ -62,7 +62,7 @@ const events = [
     description: "连续两年无缘季后赛，单赛季场均 31.6 分仍独木难支，球队重建期陷入 “科比去哪儿” 交易传闻漩涡s",
     start: new Date("2006-01-01"),
     end: new Date("2007-12-31"),
-    peak: 0.4,
+    peak: 0.45,
     category: "职业"
   },
   {
@@ -70,7 +70,7 @@ const events = [
     description: "总决赛负于凯尔特人 “三巨头”，科比场均 25.7 分但关键战失误频发，错失 “单季 MVP + 总冠军” 双料登顶机会",
     start: new Date("2008-01-01"),
     end: new Date("2008-12-31"),
-    peak: 0.4,
+    peak: 0.45,
     category: "职业"
   },
   {

@@ -44,7 +44,7 @@ let isManualInterruption = false;
 const peakThreshold = 0.6;
 const categoryColor = {
   "职业": "#4CAF50",
-  "家庭": "#2196F3",
+  // "家庭": "#2196F3",
   "社会责任": "#FFC107",
   "其他": "#9E9E9E"
 };
@@ -150,36 +150,6 @@ function showMediaItem(index) {
   };
 }
 
-  // else if (item.type === "video") {
-  //   const video = mediaContainer.append("video")
-  //     .attr("src", item.src)
-  //     .attr("class", "media-display")
-  //     .attr("controls", true)
-  //     .attr("muted", true)
-  //     .style("cursor", "zoom-in")
-  //     .on("click", () => showModal(item))
-  //     .node();
-  //   video.play().then(() => {
-  //       // 播放成功
-  //     }).catch(err => {
-  //       console.warn("自动播放失败：", err);
-  //     });
-
-  //   // video.onended = () => {
-  //   //   nextMedia();
-  //   // };
-  //   video.onended = () => {
-  //     //  currentIndex = (currentIndex + 1) % events.length;
-  //     //   playNextEvent();
-  //   // 如果是自动播放状态，则进入下一条事件
-  //     if (!isManualInterruption) {
-  //       currentIndex = (currentIndex + 1) % events.length;
-  //       playNextEvent();
-  //     } else {
-  //       nextMedia(); // 手动状态下正常播放下一媒体
-  //     }
-  //   };
-
   }
 
 
@@ -207,36 +177,16 @@ timelineDiv.scrollTo({
   left: playheadX - timelineDiv.clientWidth / 2,
   behavior: "smooth"
 });
-
-
-
 }
-
-
-
 
 // 设置自动播放events中的内容
 let intervalId = null;
-// function startAutoPlay() {
-//   stopAutoPlay();
-//   isManualInterruption = false; // 重置标志
-
-//   autoplayTimer = setInterval(() => {
-//     if (!isManualInterruption) {
-//       showEvent(events[currentIndex], true); // 自动播放用 true
-//       currentIndex = (currentIndex + 1) % events.length;
-//     }
-//   }, 5000);
-// }
 function startAutoPlay() {
   stopAutoPlay();
   isManualInterruption = false;
   currentIndex = 0;
   playNextEvent();
 }
-
-
-
 
 function playNextEvent() {
   if (isManualInterruption) return;
@@ -270,7 +220,6 @@ function stopAutoPlay() {
 }
 
 
-
 document.addEventListener("DOMContentLoaded", () => {
   renderFlowerPlot();
   renderTimeline();
@@ -298,26 +247,12 @@ function showModal(item) {
       content.append("img")
         .attr("src", item.src)
         .attr("class", "modal-media");
-
-    // content.append("img")
-    //   .attr("src", item.src)
-    //   .style("max-width", "100%")
-    //   .style("max-height", "100%")
-    //   .style("border-radius", "10px");
   } else if (item.type === "video") {
         content.append("video")
           .attr("src", item.src)
           .attr("class", "modal-media")
           .attr("controls", true)
           .attr("autoplay", true);
-
-    // content.append("video")
-    //   .attr("src", item.src)
-    //   .attr("controls", true)
-    //   .attr("autoplay", true)
-    //   .style("max-width", "100%")
-    //   .style("max-height", "100%")
-    //   .style("border-radius", "10px");
   }
 
   modal.style("display", "flex");

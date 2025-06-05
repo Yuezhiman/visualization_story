@@ -6,7 +6,7 @@ function renderFlowerPlot() {
   const peakThreshold = 0.6;
   const categoryColor = {
     "职业": "#4CAF50",
-    "家庭": "#2196F3",
+    // "家庭": "#2196F3",
     "社会责任": "#FFC107",
     "其他": "#9E9E9E"
   };
@@ -75,9 +75,9 @@ function renderFlowerPlot() {
     .attr("x", center.x)
     .attr("y", center.y + 15)
     .attr("text-anchor", "middle")
-    .attr("font-size", "14px")
-    .attr("fill", "#a0a0d0");
-  
+    .attr("font-size", "13px")
+    .attr("fill", "#rgba(22, 55, 60, 0.72)");
+  // a0a0d0
 
   // 分离内部和外部事件
   const inside = events.filter(d => d.peak >= peakThreshold);
@@ -151,26 +151,6 @@ function renderFlowerPlot() {
     .attr("r", d => 6 + d.peak * 6)
     .attr("opacity", 1);
     
-  // // 添加事件标题
-  // svg.selectAll(".flower-label")
-  //   .data(all)
-  //   .enter()
-  //   .append("text")
-  //   .attr("class", "flower-label")
-  //   .attr("x", center.x)
-  //   .attr("y", center.y)
-  //   .attr("text-anchor", "middle")
-  //   .attr("font-size", "10px")
-  //   .attr("fill", "rgba(0, 0, 0, 0)")
-  //   .attr("pointer-events", "none")
-  //   .text(d => d.title)
-  //   .transition()
-  //   .delay(1000)
-  //   .duration(500)
-  //   .attr("x", d => d.x)
-  //   .attr("y", d => d.y + (d.peak >= peakThreshold ? 25 : 30))
-  //   .attr("fill", "rgba(0, 0, 0, 0.8)");
-
 svg.selectAll(".flower-label")
     .data(all)
     .enter()
@@ -188,7 +168,7 @@ svg.selectAll(".flower-label")
     })
     .attr("dy", "0.35em")
     .attr("font-size", "10px")
-    .attr("fill", "rgba(0, 0, 0, 0.8)")
+    .attr("fill", "rgba(23, 110, 250, 0.8)")
     .each(function(d) {
       const textLines = d.title.split("："); // 按冒号分段
     const self = d3.select(this); // 获取当前text元素
@@ -227,6 +207,7 @@ svg.selectAll(".flower-label")
       .attr("y", 5)
       .text(category)
       .attr("fill", "#333")
+      // .attr("fill","#rgba(227, 37, 138, 0.72)")
       .attr("font-size", "14px");
   });
 }
